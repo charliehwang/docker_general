@@ -1,0 +1,30 @@
+#
+# docker-compose --project-name docker-web -f ./docker-compose.yml up --build
+#
+version: '3'
+services:
+	web:
+    container_name: ${COMPOSE_PROJECT_NAME}_${NODEJS_SERVER_NAME}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_VARIANT: ${NODEJS_VARIANT}
+    command: ${SLEEP_CMD}
+    ports:
+        - "4040:4040"
+    environment:
+        NODE_ENV: ${NODEJS_ENV}
+    volumes:
+        - ${PWD}:/home/node/project
+    working_dir: /home/node/project
+    networks:
+        app_net:
+            ipv4_address: ${IP_NODE_SERVER}
+networks:
+    app_net:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                -   subnet: ${IP_SUBNET}

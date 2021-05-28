@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  node:
+    build: 
+      context: ./node
+      dockerfile: Dockerfile
+      args: 
+        NODEJS_VARIANT: ${NODEJS_VARIANT}
+    working_dir: /workdir
+    environment:
+      - NODE_ENV=${NODEJS_ENV}
+    volumes:
+      - ../:/workdir
+    expose:
+      - "3000" # app
+    command: ${SLEEP_CMD}
