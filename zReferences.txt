@@ -1,2 +1,7 @@
 https://blog.logrocket.com/node-js-docker-improve-dx/
 
+https://github.com/ashleydavis/docker-compose-nodejs-example
+https://gist.github.com/avishayp/33fcee06ee440524d21600e2e817b6b7
+
+https://github.com/panubo/docker-sshd
+https://francesco-camillini.medium.com/inject-ssh-private-key-securely-into-a-docker-container-8403b72ab9e3

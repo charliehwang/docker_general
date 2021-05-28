@@ -6,11 +6,35 @@ services:
       dockerfile: Dockerfile
       args: 
         NODEJS_VARIANT: ${NODEJS_VARIANT}
+        USER: admin
+        USER_GROUP: ${USER_GROUP}
     working_dir: /workdir
     environment:
       - NODE_ENV=${NODEJS_ENV}
     volumes:
       - ../:/workdir
-    expose:
-      - "3000" # app
+    secrets:
+      - id_rsa
+      # - ${SSH_PUB_KEY}:/etc/authorized_keys/${USER}
+      # - /Users/charlieh/.ssh/id_rsa.pub:/etc/authorized_keys/admin
+      # - /Users/charlieh/.ssh/id_rsa.pub:/home/admin/.ssh/authorized_keys
+    ports:
+      - "3000:3000"
+      - "2222:22"
     command: ${SLEEP_CMD}
+
+secrets:
+    id_rsa:
+      file: /Users/charlieh/.ssh/id_rsa.pub
+
+  # mongodb:
+  #   image: mongo:latest
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ../mongodb-data:/data/db
+  #   ports:
+  #     - "27017:27017"
+    # environment:
+    #  MONGO_INITDB_ROOT_USERNAME: root
+    #  MONGO_INITDB_ROOT_PASSWORD: example
+    #  MONGO_INITDB_DATABASE: your-database-here
