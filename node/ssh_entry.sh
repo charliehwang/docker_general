@@ -24,22 +24,22 @@ if [ ! "$(ls -A /etc/ssh)" ]; then
     cp -a /etc/ssh.cache/* /etc/ssh/
 fi
 
-set_hostkeys() {
-    printf '%s\n' \
-        'set /files/etc/ssh/sshd_config/HostKey[1] /etc/ssh/keys/ssh_host_rsa_key' \
-        'set /files/etc/ssh/sshd_config/HostKey[2] /etc/ssh/keys/ssh_host_dsa_key' \
-        'set /files/etc/ssh/sshd_config/HostKey[3] /etc/ssh/keys/ssh_host_ecdsa_key' \
-        'set /files/etc/ssh/sshd_config/HostKey[4] /etc/ssh/keys/ssh_host_ed25519_key' \
-    | augtool -s 1> /dev/null
-}
+# set_hostkeys() {
+#     printf '%s\n' \
+#         # 'set /files/etc/ssh/sshd_config/HostKey[1] /etc/ssh/keys/ssh_host_rsa_key' \
+#         # 'set /files/etc/ssh/sshd_config/HostKey[2] /etc/ssh/keys/ssh_host_dsa_key' \
+#         # 'set /files/etc/ssh/sshd_config/HostKey[3] /etc/ssh/keys/ssh_host_ecdsa_key' \
+#         # 'set /files/etc/ssh/sshd_config/HostKey[4] /etc/ssh/keys/ssh_host_ed25519_key' \
+#     | augtool -s 1> /dev/null
+# }
 
 print_fingerprints() {
     local BASE_DIR=${1-'/etc/ssh'}
     for item in dsa rsa ecdsa ed25519; do
         echo ">>> Fingerprints for ${item} host key"
-        ssh-keygen -E md5 -lf ${BASE_DIR}/ssh_host_${item}_key
-        ssh-keygen -E sha256 -lf ${BASE_DIR}/ssh_host_${item}_key
-        ssh-keygen -E sha512 -lf ${BASE_DIR}/ssh_host_${item}_key
+        # ssh-keygen -E md5 -lf ${BASE_DIR}/ssh_host_${item}_key
+        # ssh-keygen -E sha256 -lf ${BASE_DIR}/ssh_host_${item}_key
+        # ssh-keygen -E sha512 -lf ${BASE_DIR}/ssh_host_${item}_key
     done
 }
 
@@ -132,83 +132,83 @@ else
     echo "INFO: root account is now locked by default. Set SSH_ENABLE_ROOT to unlock the account."
 fi
 
-# Update MOTD
-if [ -v MOTD ]; then
-    echo -e "$MOTD" > /etc/motd
-fi
+# # Update MOTD
+# if [ -v MOTD ]; then
+#     echo -e "$MOTD" > /etc/motd
+# fi
 
 # PasswordAuthentication (disabled by default)
-if [[ "${SSH_ENABLE_PASSWORD_AUTH}" == "true" ]]; then
-    echo 'set /files/etc/ssh/sshd_config/PasswordAuthentication yes' | augtool -s 1> /dev/null
-    echo "WARNING: password authentication enabled."
-else
-    echo 'set /files/etc/ssh/sshd_config/PasswordAuthentication no' | augtool -s 1> /dev/null
-    echo "INFO: password authentication is disabled by default. Set SSH_ENABLE_PASSWORD_AUTH=true to enable."
-fi
+# if [[ "${SSH_ENABLE_PASSWORD_AUTH}" == "true" ]]; then
+#     echo 'set /files/etc/ssh/sshd_config/PasswordAuthentication yes' | augtool -s 1> /dev/null
+#     echo "WARNING: password authentication enabled."
+# else
+#     echo 'set /files/etc/ssh/sshd_config/PasswordAuthentication no' | augtool -s 1> /dev/null
+#     echo "INFO: password authentication is disabled by default. Set SSH_ENABLE_PASSWORD_AUTH=true to enable."
+# fi
 
-configure_sftp_only_mode() {
-    echo "INFO: configuring sftp only mode"
-    : ${SFTP_CHROOT:='/data'}
-    chown 0:0 ${SFTP_CHROOT}
-    chmod 755 ${SFTP_CHROOT}
-    printf '%s\n' \
-        'set /files/etc/ssh/sshd_config/Subsystem/sftp "internal-sftp"' \
-        'set /files/etc/ssh/sshd_config/AllowTCPForwarding no' \
-        'set /files/etc/ssh/sshd_config/GatewayPorts no' \
-        'set /files/etc/ssh/sshd_config/X11Forwarding no' \
-        'set /files/etc/ssh/sshd_config/ForceCommand internal-sftp' \
-        "set /files/etc/ssh/sshd_config/ChrootDirectory ${SFTP_CHROOT}" \
-    | augtool -s 1> /dev/null
-}
+# configure_sftp_only_mode() {
+#     echo "INFO: configuring sftp only mode"
+#     : ${SFTP_CHROOT:='/data'}
+#     chown 0:0 ${SFTP_CHROOT}
+#     chmod 755 ${SFTP_CHROOT}
+#     printf '%s\n' \
+#         'set /files/etc/ssh/sshd_config/Subsystem/sftp "internal-sftp"' \
+#         'set /files/etc/ssh/sshd_config/AllowTCPForwarding no' \
+#         'set /files/etc/ssh/sshd_config/GatewayPorts no' \
+#         'set /files/etc/ssh/sshd_config/X11Forwarding no' \
+#         'set /files/etc/ssh/sshd_config/ForceCommand internal-sftp' \
+#         "set /files/etc/ssh/sshd_config/ChrootDirectory ${SFTP_CHROOT}" \
+#     | augtool -s 1> /dev/null
+# }
 
-configure_scp_only_mode() {
-    echo "INFO: configuring scp only mode"
-    USERS=$(echo $SSH_USERS | tr "," "\n")
-    for U in $USERS; do
-        _NAME=$(echo "${U}" | cut -d: -f1)
-        usermod -s '/usr/bin/rssh' ${_NAME}
-    done
-    (grep '^[a-zA-Z]' /etc/rssh.conf.default; echo "allowscp") > /etc/rssh.conf
-}
+# configure_scp_only_mode() {
+#     echo "INFO: configuring scp only mode"
+#     USERS=$(echo $SSH_USERS | tr "," "\n")
+#     for U in $USERS; do
+#         _NAME=$(echo "${U}" | cut -d: -f1)
+#         usermod -s '/usr/bin/rssh' ${_NAME}
+#     done
+#     (grep '^[a-zA-Z]' /etc/rssh.conf.default; echo "allowscp") > /etc/rssh.conf
+# }
 
-configure_rsync_only_mode() {
-    echo "INFO: configuring rsync only mode"
-    USERS=$(echo $SSH_USERS | tr "," "\n")
-    for U in $USERS; do
-        _NAME=$(echo "${U}" | cut -d: -f1)
-        usermod -s '/usr/bin/rssh' ${_NAME}
-    done
-    (grep '^[a-zA-Z]' /etc/rssh.conf.default; echo "allowrsync") > /etc/rssh.conf
-}
+# configure_rsync_only_mode() {
+#     echo "INFO: configuring rsync only mode"
+#     USERS=$(echo $SSH_USERS | tr "," "\n")
+#     for U in $USERS; do
+#         _NAME=$(echo "${U}" | cut -d: -f1)
+#         usermod -s '/usr/bin/rssh' ${_NAME}
+#     done
+#     (grep '^[a-zA-Z]' /etc/rssh.conf.default; echo "allowrsync") > /etc/rssh.conf
+# }
 
-configure_ssh_options() {
-    # Enable AllowTcpForwarding
-    if [[ "${TCP_FORWARDING}" == "true" ]]; then
-        echo 'set /files/etc/ssh/sshd_config/AllowTcpForwarding yes' | augtool -s 1> /dev/null
-    fi
-    # Enable GatewayPorts
-    if [[ "${GATEWAY_PORTS}" == "true" ]]; then
-        echo 'set /files/etc/ssh/sshd_config/GatewayPorts yes' | augtool -s 1> /dev/null
-    fi
-    # Disable SFTP
-    if [[ "${DISABLE_SFTP}" == "true" ]]; then
-        printf '%s\n' \
-            'rm /files/etc/ssh/sshd_config/Subsystem/sftp' \
-            'rm /files/etc/ssh/sshd_config/Subsystem' \
-        | augtool -s 1> /dev/null
-    fi
-}
+# configure_ssh_options() {
+#     # Enable AllowTcpForwarding
+#     if [[ "${TCP_FORWARDING}" == "true" ]]; then
+#         echo 'set /files/etc/ssh/sshd_config/AllowTcpForwarding yes' | augtool -s 1> /dev/null
+#     fi
+#     # Enable GatewayPorts
+#     if [[ "${GATEWAY_PORTS}" == "true" ]]; then
+#         echo 'set /files/etc/ssh/sshd_config/GatewayPorts yes' | augtool -s 1> /dev/null
+#     fi
+#     # Disable SFTP
+#     if [[ "${DISABLE_SFTP}" == "true" ]]; then
+#         printf '%s\n' \
+#             'rm /files/etc/ssh/sshd_config/Subsystem/sftp' \
+#             'rm /files/etc/ssh/sshd_config/Subsystem' \
+#         | augtool -s 1> /dev/null
+#     fi
+# }
 
-# Configure mutually exclusive modes
-if [[ "${SFTP_MODE}" == "true" ]]; then
-    configure_sftp_only_mode
-elif [[ "${SCP_MODE}" == "true" ]]; then
-    configure_scp_only_mode
-elif [[ "${RSYNC_MODE}" == "true" ]]; then
-    configure_rsync_only_mode
-else
-    configure_ssh_options
-fi
+# # Configure mutually exclusive modes
+# if [[ "${SFTP_MODE}" == "true" ]]; then
+#     configure_sftp_only_mode
+# elif [[ "${SCP_MODE}" == "true" ]]; then
+#     configure_scp_only_mode
+# elif [[ "${RSYNC_MODE}" == "true" ]]; then
+#     configure_rsync_only_mode
+# else
+#     configure_ssh_options
+# fi
 
 # Run scripts in /etc/entrypoint.d
 for f in /etc/entrypoint.d/*; do

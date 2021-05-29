@@ -1,6 +1,6 @@
 #
 # docker-compose --project-name web -f ./docker-compose.yml up --build
-# ssh -o "StrictHostKeyChecking no" -o "UserKnownHostsFile=/dev/null" -p 2222 admin@localhost
+# ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -p 2222 admin@localhost
 # 
 
 version: '3.8'
@@ -10,14 +10,13 @@ services:
       context: ./node
       dockerfile: Dockerfile
       args: 
-        NODEJS_VARIANT: ${NODEJS_VARIANT}
-        USER: admin
-        USER_GROUP: ${USER_GROUP}
+        USER: ${DOCKER_USER}
+        USER_GROUP: ${DOCKER_USER_GROUP}
     working_dir: /workdir
     environment:
       - NODE_ENV=${NODEJS_ENV}
     volumes:
-      - ../:/workdir
+      - ..:/home/${DOCKER_USER}/workspace
     secrets:
       - id_rsa
       # - ${SSH_PUB_KEY}:/etc/authorized_keys/${USER}
@@ -29,13 +28,13 @@ services:
     command: ${SLEEP_CMD}
 
 
-  # mongodb:
-  #   image: mongo:latest
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ../mongodb-data:/data/db
-  #   ports:
-  #     - "27017:27017"
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - ../mongodb-data:/data/db
+    ports:
+      - "27017:27017"
     # environment:
     #  MONGO_INITDB_ROOT_USERNAME: root
     #  MONGO_INITDB_ROOT_PASSWORD: example
