@@ -1,4 +1,4 @@
-FROM debian:sid-slim as base
+FROM debian:sid-slim --platform=linux/amd64 
 
 ARG NODE_VARIANT
 

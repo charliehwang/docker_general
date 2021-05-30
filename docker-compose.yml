@@ -21,7 +21,8 @@ services:
     secrets:
       - id_rsa
     ports:
-      - "3000:3000"
+      # - "3000:3000"
+      # - "8000:8000"
       - "2222:22"
     command: ${SLEEP_CMD}
 
