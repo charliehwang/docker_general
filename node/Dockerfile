@@ -9,13 +9,19 @@ ENV SSH_USERS=${USER}
 ENV USER_GROUP=${USER_GROUP}
 
 RUN apt-get update && apt-get install -y \
-						curl bash augeas-tools git \
+						curl bash augeas-tools git iputils-ping \
+            # Gatsby
+            dh-autoreconf \ 
 						openssh-server 
 
 
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install -y nodejs
 RUN npm install --global yarn
+
+# Gatsby
+RUN npm i -g gatsby-cli
+
 
 
 RUN deluser $(getent passwd 33 | cut -d: -f1) && \
@@ -32,7 +38,6 @@ RUN echo "USER: $USER"
 RUN echo "USER_GROUP: $USER_GROUP"
 RUN echo "USER_HOME: $USER_HOME"
 RUN echo "SSH_USERS: $SSH_USERS"
-RUN echo "SSH_PUB_KEY: $SSH_PUB_KEY"
 RUN echo "====================================="
 
 # RUN addgroup --group ${USER_GROUP} && adduser --group ${USER_GROUP} --shell /bin/bash ${USER}
