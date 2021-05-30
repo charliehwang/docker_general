@@ -1,5 +1,7 @@
 FROM debian:sid-slim as base
 
+ARG NODE_VARIANT
+
 ARG USER
 ARG USER_GROUP
 ARG USER_HOME=/home/${USER}
@@ -15,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 						openssh-server 
 
 
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VARIANT} | bash -
 RUN apt-get install -y nodejs
 RUN npm install --global yarn
 

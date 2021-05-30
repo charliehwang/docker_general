@@ -12,11 +12,12 @@ services:
       args: 
         USER: ${DOCKER_USER}
         USER_GROUP: ${DOCKER_USER_GROUP}
+        NODE_VARIANT: ${NODE_VARIANT}
     working_dir: /workdir
     environment:
       - NODE_ENV=${NODEJS_ENV}
     volumes:
-      - ..:/home/${DOCKER_USER}/workspace
+      - ${LOCAL_WORKSPACE_DIR}:/home/${DOCKER_USER}/workspace
     secrets:
       - id_rsa
     ports:
@@ -39,4 +40,4 @@ services:
 
 secrets:
     id_rsa:
-      file: ~/.ssh/id_rsa.pub
+      file: ${SSH_PUB_KEY}
