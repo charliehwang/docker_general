@@ -10,11 +10,16 @@ ENV USER_HOME=${USER_HOME}
 ENV SSH_USERS=${USER}
 ENV USER_GROUP=${USER_GROUP}
 
+ARG GIT_USER_EMAIL
+ARG GIT_USER_NAME
+
 RUN apt-get update && apt-get install -y \
 						curl bash augeas-tools git iputils-ping \
             # Gatsby
             dh-autoreconf \ 
-						openssh-server 
+						openssh-server \ 
+            # Angular
+            watchman  
 
 
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VARIANT} | bash -
@@ -29,6 +34,7 @@ RUN npm install -g typescript
 
 # Angular
 RUN npm install -g @angular/cli
+
 
 
 RUN deluser $(getent passwd 33 | cut -d: -f1) && \
@@ -52,8 +58,16 @@ RUN addgroup --group ${USER_GROUP}
 RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g ${USER_GROUP} -G sudo -u 1001 ${USER}
 RUN mkdir -p $USER_HOME/.ssh
 RUN mkdir -p /var/run/sshd
-
 # RUN echo 'admin:ttyrqttyrq' | chpasswd
+
+###########################################
+# RUN as USER then go back to ROOT
+USER ${USER}
+RUN git config --global user.email "${GIT_USER_EMAIL}"
+RUN git config --global user.name "${GIT_USER_NAME}"
+USER root
+###########################################
+
 
 COPY ssh_entry.sh /ssh_entry.sh
 RUN chmod +x /ssh_entry.sh

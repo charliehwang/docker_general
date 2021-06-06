@@ -13,6 +13,8 @@ services:
         USER: ${DOCKER_USER}
         USER_GROUP: ${DOCKER_USER_GROUP}
         NODE_VARIANT: ${NODE_VARIANT}
+        GIT_USER_EMAIL: ${GIT_USER_EMAIL}
+        GIT_USER_NAME: ${GIT_USER_NAME}
     working_dir: /workdir
     environment:
       - NODE_ENV=${NODEJS_ENV}

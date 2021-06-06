@@ -14,11 +14,15 @@ or
 docker-compose --project-name web -f ./docker-compose.yml up --build
 ```
 # Environment Variables Setup
+Use the `.env.example` file and rename it to `.env` in order for docker-compose to pick it up. 
+
 In the `.env` file you can:
 - Set `SSH_PUB_KEY` to your `id_rsa.pub` key file. Currently it's defaulted to `~/.ssh/id_rsa.pub`. There is no password set for the docker user created, so the only way to login is through the SSH public key. 
 - Set the `LOCAL_WORKSPACE_DIR` to desired. This dir on your machine will be mapped to the `/workspace` directory on the container. Currently, it's set to the directory above the docker-general repo dir. 
 - Set the user desired in docker to be created. Currently it's set to `admin`. This will be the only user able to login to the docker through ssh.
 - `NODE_VARIANT` can be set to the desired Node version install. Currently set to `14.x`
+- `GIT_USER_EMAIL` Email for git commits
+- `GIT_USER_NAME` Full name for git commits
 
 # Setup VSCode Remote SSH
 1. Startup the container through the above commands.
