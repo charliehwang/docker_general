@@ -24,6 +24,11 @@ RUN npm install --global yarn
 # Gatsby
 RUN npm i -g gatsby-cli
 
+# TypeScript
+RUN npm install -g typescript
+
+# Angular
+RUN npm install -g @angular/cli
 
 
 RUN deluser $(getent passwd 33 | cut -d: -f1) && \
