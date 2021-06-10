@@ -42,9 +42,16 @@ RUN npm install -g @angular/cli
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip"
 RUN unzip awscliv2.zip
 RUN ./aws/install
+
 # AWS Cloud Development Kit
 # RUN npm install -g @aws-cdk/aws-s3@1.31.0
 RUN npm install -g aws-cdk
+
+# AWS SAM CLI
+# curl -L follows the github redirect
+RUN curl -L "https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip" -o "aws-sam-cli.zip"
+RUN unzip aws-sam-cli.zip  -d aws-sam-cli
+RUN ./aws-sam-cli/install
 ########################################
 
 RUN deluser $(getent passwd 33 | cut -d: -f1) && \

@@ -20,6 +20,7 @@ services:
       - NODE_ENV=${NODEJS_ENV}
     volumes:
       - ${LOCAL_WORKSPACE_DIR}:/home/${DOCKER_USER}/workspace
+      - ${LOCAL_AWS_DIR}:/home/${DOCKER_USER}/.aws
     secrets:
       - id_rsa
     ports:
