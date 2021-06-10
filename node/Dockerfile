@@ -28,6 +28,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VARIANT} | bash -
 RUN apt-get install -y nodejs
 RUN npm install --global yarn
 
+# ESLint
+RUN npm install -g eslint
+
 # Gatsby
 RUN npm i -g gatsby-cli
 

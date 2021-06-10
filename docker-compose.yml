@@ -21,6 +21,7 @@ services:
     volumes:
       - ${LOCAL_WORKSPACE_DIR}:/home/${DOCKER_USER}/workspace
       - ${LOCAL_AWS_DIR}:/home/${DOCKER_USER}/.aws
+      - /var/run/docker.sock:/var/run/docker.sock
     secrets:
       - id_rsa
     ports:

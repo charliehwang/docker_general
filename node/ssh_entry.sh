@@ -13,6 +13,8 @@ chmod 700 ${USER_HOME}/.ssh
 chown ${USER_GROUP} ${USER_HOME}/.ssh/authorized_keys
 chmod 600 ${USER_HOME}/.ssh/authorized_keys
 
+# Allow User to run docker containers
+chown admin:admin /var/run/docker.sock 
 
 set -e
 
