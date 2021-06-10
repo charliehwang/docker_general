@@ -19,7 +19,9 @@ RUN apt-get update && apt-get install -y \
             dh-autoreconf \ 
 						openssh-server \ 
             # Angular
-            watchman  
+            watchman  \
+            # AWS
+            zip
 
 
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VARIANT} | bash -
@@ -35,7 +37,15 @@ RUN npm install -g typescript
 # Angular
 RUN npm install -g @angular/cli
 
-
+################ AWS ###################
+# AWS Command Line
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+# AWS Cloud Development Kit
+# RUN npm install -g @aws-cdk/aws-s3@1.31.0
+RUN npm install -g aws-cdk
+########################################
 
 RUN deluser $(getent passwd 33 | cut -d: -f1) && \
     delgroup $(getent group 33 | cut -d: -f1) 2>/dev/null || true && \
