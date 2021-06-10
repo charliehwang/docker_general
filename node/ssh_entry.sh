@@ -4,17 +4,22 @@
 
 
 echo "----------------------------------------------------"
+echo "DOCKER_USER: ${DOCKER_USER}"
+echo "DOCKER_USER_GROUP: ${DOCKER_USER_GROUP}"
 echo "USER_HOME: ${USER_HOME}"
 echo "----------------------------------------------------"
 cat /run/secrets/id_rsa > ${USER_HOME}/.ssh/authorized_keys
 cat /run/secrets/id_rsa > /etc/authorized_keys/${SSH_USERS}
-chown ${USER_GROUP} ${USER_HOME}/.ssh
+chown ${DOCKER_USER} ${USER_HOME}/.ssh
 chmod 700 ${USER_HOME}/.ssh
-chown ${USER_GROUP} ${USER_HOME}/.ssh/authorized_keys
+chown ${DOCKER_USER} ${USER_HOME}/.ssh/authorized_keys
 chmod 600 ${USER_HOME}/.ssh/authorized_keys
 
 # Allow User to run docker containers
-chown admin:admin /var/run/docker.sock 
+chown ${DOCKER_USER}:${DOCKER_USER_GROUP} /var/run/docker.sock 
+
+# for AWS credentials
+chown ${DOCKER_USER}:${DOCKER_USER_GROUP} /home/${DOCKER_USER}/.aws/*
 
 set -e
 

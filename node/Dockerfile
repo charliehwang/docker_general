@@ -2,13 +2,15 @@ FROM debian:sid-slim
 
 ARG NODE_VARIANT
 
-ARG USER
-ARG USER_GROUP
-ARG USER_HOME=/home/${USER}
+ARG DOCKER_USER
+ARG DOCKER_USER_GROUP
+ARG USER_HOME=/home/${DOCKER_USER}
+ENV USER_GROUP=${DOCKER_USER_GROUP}
 
+ENV DOCKER_USER ${DOCKER_USER}
+ENV DOCKER_USER_GROUP ${DOCKER_USER_GROUP}
 ENV USER_HOME=${USER_HOME}
-ENV SSH_USERS=${USER}
-ENV USER_GROUP=${USER_GROUP}
+ENV SSH_USERS=${DOCKER_USER}
 
 ARG GIT_USER_EMAIL
 ARG GIT_USER_NAME
@@ -67,24 +69,29 @@ RUN deluser $(getent passwd 33 | cut -d: -f1) && \
     cp -a /etc/ssh /etc/ssh.cache
 
 RUN echo "====================================="
-RUN echo "USER: $USER"
-RUN echo "USER_GROUP: $USER_GROUP"
+RUN echo "DOCKER_USER: $DOCKER_USER"
+RUN echo "DOCKER_USER_GROUP: $DOCKER_USER_GROUP"
 RUN echo "USER_HOME: $USER_HOME"
 RUN echo "SSH_USERS: $SSH_USERS"
 RUN echo "====================================="
 
 # RUN addgroup --group ${USER_GROUP} && adduser --group ${USER_GROUP} --shell /bin/bash ${USER}
-RUN addgroup --group ${USER_GROUP} 
-RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g ${USER_GROUP} -G sudo -u 1001 ${USER}
+RUN addgroup --group ${DOCKER_USER_GROUP} 
+RUN useradd -rm -d ${USER_HOME} -s /bin/bash -g ${DOCKER_USER_GROUP} -G sudo -u 1001 ${DOCKER_USER}
 RUN mkdir -p $USER_HOME/.ssh
 RUN mkdir -p /var/run/sshd
 # RUN echo 'admin:ttyrqttyrq' | chpasswd
 
 ###########################################
 # RUN as USER then go back to ROOT
-USER ${USER}
+USER ${DOCKER_USER}
 RUN git config --global user.email "${GIT_USER_EMAIL}"
 RUN git config --global user.name "${GIT_USER_NAME}"
+
+# for AWS
+RUN mkdir -p /home/${DOCKER_USER}/.aws 
+RUN chown ${DOCKER_USER}:${DOCKER_USER_GROUP} /home/${DOCKER_USER}/.aws 
+
 USER root
 ###########################################
 

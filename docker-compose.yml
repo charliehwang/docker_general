@@ -3,15 +3,15 @@
 # ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -p 2222 admin@localhost
 # 
 
-version: '3.8'
+version: '3.3'
 services:
   node:
     build: 
       context: ./node
       dockerfile: Dockerfile
       args: 
-        USER: ${DOCKER_USER}
-        USER_GROUP: ${DOCKER_USER_GROUP}
+        DOCKER_USER: ${DOCKER_USER}
+        DOCKER_USER_GROUP: ${DOCKER_USER_GROUP}
         NODE_VARIANT: ${NODE_VARIANT}
         GIT_USER_EMAIL: ${GIT_USER_EMAIL}
         GIT_USER_NAME: ${GIT_USER_NAME}
@@ -20,7 +20,7 @@ services:
       - NODE_ENV=${NODEJS_ENV}
     volumes:
       - ${LOCAL_WORKSPACE_DIR}:/home/${DOCKER_USER}/workspace
-      - ${LOCAL_AWS_DIR}:/home/${DOCKER_USER}/.aws
+      - ${LOCAL_AWS_DIR}:/home/${DOCKER_USER}/.aws/
       - /var/run/docker.sock:/var/run/docker.sock
     secrets:
       - id_rsa
